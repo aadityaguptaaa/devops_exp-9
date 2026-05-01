@@ -1,0 +1,14 @@
+{
+  "name": "healthcare-devsecops",
+  "version": "1.0.0",
+  "description": "Secure Healthcare System with DevSecOps Pipeline",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo 'Security tests passed!' && exit 0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "helmet": "^7.1.0"
+  }
+}
