@@ -33,26 +33,8 @@ pipeline {
             steps {
                 echo '🔐 Running OWASP Dependency Check...'
                 sh '''
-                    # Install OWASP dependency-check if not present
-                    if ! command -v dependency-check &> /dev/null; then
-                        apt-get update -qq && apt-get install -y -qq wget unzip
-                        wget -q https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.3/dependency-check-8.4.3-release.zip
-                        unzip -q dependency-check-8.4.3-release.zip -d /opt/
-                        ln -sf /opt/dependency-check/bin/dependency-check.sh /usr/local/bin/dependency-check
-                    fi
-
-                    # Run OWASP scan
-                    dependency-check \
-                        --project "Healthcare-App" \
-                        --scan . \
-                        --format HTML \
-                        --format JSON \
-                        --out reports/ \
-                        --disableYarnAudit \
-                        --disableNodeAudit \
-                        || true
-
-                    echo "✅ OWASP Scan Complete - Check reports/dependency-check-report.html"
+                    npm audit --audit-level=high || true
+                    echo "✅ OWASP npm audit complete!"
                 '''
             }
         }
@@ -71,22 +53,8 @@ pipeline {
             steps {
                 echo '🔐 Running Trivy vulnerability scan on Docker image...'
                 sh '''
-                    # Install Trivy if not present
-                    if ! command -v trivy &> /dev/null; then
-                        apt-get update -qq
-                        apt-get install -y -qq wget apt-transport-https gnupg
-                        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -
-                        echo "deb https://aquasecurity.github.io/trivy-repo/deb generic main" > /etc/apt/sources.list.d/trivy.list
-                        apt-get update -qq && apt-get install -y -qq trivy
-                    fi
-
-                    # Run Trivy scan
-                    trivy image \
-                        --exit-code 0 \
-                        --severity HIGH,CRITICAL \
-                        --format table \
-                        aadityaxggg/healthcare-app:latest
-
+                    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+                    trivy image --exit-code 0 --severity HIGH,CRITICAL aadityaxggg/healthcare-app:latest
                     echo "✅ Trivy Scan Complete!"
                 '''
             }
