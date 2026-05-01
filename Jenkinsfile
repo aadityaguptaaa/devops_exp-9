@@ -53,7 +53,7 @@ pipeline {
             steps {
                 echo '🔐 Running Trivy vulnerability scan on Docker image...'
                 sh '''
-                    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+                    export PATH=$PATH:/var/jenkins_home/bin
                     trivy image --exit-code 0 --severity HIGH,CRITICAL aadityaxggg/healthcare-app:latest
                     echo "✅ Trivy Scan Complete!"
                 '''
